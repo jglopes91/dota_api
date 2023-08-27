@@ -1,0 +1,57 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - host: host.docker.internal
+    name: tomcat_dotaapi
+    port: 8081
+    protocol: http
+    plugins:
+      - name: rate-limiting
+        enabled: true
+        config:
+          limit_by: ip
+          second: 10
+          minute: 30
+  - host: host.docker.internal
+    name: tomcat_registerapi
+    port: 8082
+    protocol: http
+
+routes:
+  - name: health_dotaapi
+    paths:
+      - /health
+    service:
+      tomcat_dotaapi
+    strip_path: false
+
+  - name: swagger_dotaapi
+    service:
+      tomcat_dotaapi
+    paths:
+      - /v3/api-docs
+      - /swagger-ui
+    strip_path: false
+
+  - name: heroes_dotaapi
+    paths:
+      - /heroes
+    service:
+      tomcat_dotaapi
+    strip_path: false
+
+  - name: user_register_registerapi
+    paths:
+      - /register
+    service:
+      tomcat_registerapi
+    strip_path: false
+
+  - name: swagger_registerapi
+    service:
+      tomcat_registerapi
+    paths:
+      - /v3/api-docs
+      - /swagger-ui
+    strip_path: false
